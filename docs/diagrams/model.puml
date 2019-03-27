@@ -1,0 +1,65 @@
+@startuml
+
+' UI Widgets
+
+class Region {
+    +Id: string
+    -services: []*Service
+    +UpdateServiceInstances(serviceId string)
+    +GetServiceIds() []string
+    -getServiceById(serviceId string) *Service
+    -getServiceInstanceById(service *Service, instanceId string) *ServiceInstance
+}
+
+class Service {
+    +Id: string
+    -instances: []*ServiceInstance
+    +SetServiceInstances(serviceInstances []*ServiceInstance)
+    +UpdateServiceInstance(serviceInstance *ServiceInstance)
+    +GetServiceInstanceIds() []string
+    -getServiceInstanceById(instanceId string) *ServiceInstance
+}
+
+interface ServiceInstance {
+    +GetId() string
+	+GetData() string
+	+SetId(id string)
+	+SetData(data interface{})
+}
+
+class BaseInstance {
+    -id string
+    -data string
+}
+
+class LambdaInstance {
+    BaseInstance
+}
+
+class DynamoDBInstance {
+    BaseInstance
+}
+
+class EC2Instance {
+    BaseInstance
+}
+
+class S3Instance {
+    BaseInstance
+}
+
+Region *-down- Service
+Service *-down- ServiceInstance
+
+ServiceInstance o-down- LambdaInstance
+ServiceInstance o-down- DynamoDBInstance
+ServiceInstance o-down- EC2Instance
+ServiceInstance o-down- S3Instance
+
+BaseInstance *-up- LambdaInstance
+BaseInstance *-up- DynamoDBInstance
+BaseInstance *-up- EC2Instance
+BaseInstance *-up- S3Instance
+
+
+@enduml

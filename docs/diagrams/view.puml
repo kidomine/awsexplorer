@@ -1,0 +1,38 @@
+@startuml
+
+class RegionListView {
+    SetData(regionList []string)
+    Render()
+}
+
+class ServiceListView {
+    SetData(serviceList []string)
+    Render()
+}
+
+class ServiceInstanceListView {
+    SetData(instanceList []string)
+    Render()
+}
+
+class LambdaInstanceView {
+    SetData()
+    Render()
+}
+
+class DynamoDBInstanceView {
+    SetData()
+    Render()
+}
+
+class EC2InstanceView {
+    SetData()
+    Render()
+}
+
+class S3InstanceView {
+    SetData()
+    Render()
+}
+
+@enduml
