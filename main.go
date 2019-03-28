@@ -2,22 +2,10 @@ package main
 
 import (
 	"github.com/gizak/termui"
-	"github.com/gizak/termui/widgets"
 	"github.com/kidomine/awsexplorer/model"
+	"github.com/kidomine/awsexplorer/view"
 	"log"
 )
-
-//TODO: temporary
-func newListWidget(title string, x1, y1, x2, y2 int) *widgets.List {
-	lw := widgets.NewList()
-	lw.Title = title
-	lw.Rows = nil
-	lw.TextStyle = termui.NewStyle(termui.ColorYellow)
-	lw.WrapText = false
-	lw.SetRect(x1, y1, x2, y2)
-
-	return lw
-}
 
 func main() {
 	if err := termui.Init(); err != nil {
@@ -25,15 +13,17 @@ func main() {
 	}
 	defer termui.Close()
 
-	regionListWidget := newListWidget("Regions", 0, 0, 20, 45)
-	serviceListWidget := newListWidget("Services", 21, 0, 41, 45)
-
+	var serviceList []string
 	rs := model.NewRegionList()
 
-	regionListWidget.Rows = model.GetRegionIds(rs)
-	serviceListWidget.Rows = nil
+	regionListView := view.NewRegionListView(model.GetRegionIds(rs))
+	serviceListView := view.NewServiceListView(serviceList)
 
-	termui.Render(regionListWidget)
+	currRegion := model.SelectRegionById(rs, regionListView.GetSelectedData())
+	serviceListView.SetData(currRegion.GetServiceIds())
+
+	regionListView.Render()
+	serviceListView.Render()
 
 	uiEvents := termui.PollEvents()
 	for {

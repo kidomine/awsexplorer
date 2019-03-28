@@ -1,13 +1,16 @@
 package model
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"reflect"
 )
 
 type Region struct {
 	Id       string
 	services []*Service
+	session  *session.Session
 }
 
 func NewRegionList() []*Region {
@@ -33,7 +36,20 @@ func GetRegionIds(regionList []*Region) []string {
 	return regionIds
 }
 
+func SelectRegionById(regionList []*Region, regionId string) *Region {
+	for _, region := range regionList {
+		if region.Id == regionId {
+			return region
+		}
+	}
+
+	return nil
+}
+
 func newRegion(regionId string, awsRegion *endpoints.Region) *Region {
+
+	sessionInstance, _ := session.NewSession(&aws.Config{Region: aws.String(regionId)})
+
 	awsServices := awsRegion.Services()
 	var services []*Service
 
@@ -42,19 +58,8 @@ func newRegion(regionId string, awsRegion *endpoints.Region) *Region {
 		services = append(services, newService(serviceId, &awsService))
 	}
 
-	return &Region{regionId, services}
+	return &Region{regionId, services, sessionInstance}
 }
-
-//func (r *Region) SetRegionServices(services []*Service) {
-//	r.services = services
-//}
-
-//func (r *Region) SetServiceInstances(serviceId string, serviceInstances []*ServiceInstance) {
-//	service := r.getServiceById(serviceId)
-//	if service != nil {
-//		service.SetServiceInstances(serviceInstances)
-//	}
-//}
 
 func (r *Region) UpdateServiceInstances(serviceId string) {
 	//TODO: connect to AWS and obtain list of service instances
