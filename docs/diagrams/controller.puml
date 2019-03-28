@@ -1,0 +1,18 @@
+@startuml
+
+class Controller {
+    -regionList []*Region
+    -regionListView *RegionListView
+    -serviceListView *ServiceListView
+    -serviceInstanceListView *ServiceInstanceListView
+    -currentView View
+    +Initialize()
+    +GetRegionIds(regionList []*Region): []string
+    +SelectRegionById(regionList []*Region, regionId string): *Region
+    +HandleEvent(event string)
+    +Render()
+}
+
+Controller .> View
+
+@enduml
