@@ -1,45 +1,63 @@
 @startuml
 
+interface View {
+    +GetSelectedData(): string
+    +HandleEvent(event string)
+    +Render()
+}
+
 class ListView {
 	-listWidget: *widgets.List
 	+SetData(listData []string)
-    +GetSelectedData()
+    +GetSelectedData(): string
+    +HandleEvent(event string)
     +Render()
     +ScrollUp()
     +ScrollDown()
 }
 
 class RegionListView {
+    +Render()
 }
 
 class ServiceListView {
+    +Render()
 }
 
 class ServiceInstanceListView {
+    +Render()
 }
 
+View <|.down. RegionListView
+View <|.down. ServiceListView
+View <|.down. ServiceInstanceListView
+View <|.down. LambdaInstanceView
+View <|.down. DynamoDBInstanceView
+View <|.down. EC2InstanceView
+View <|.down. S3InstanceView
+
 class LambdaInstanceView {
-    SetData()
-    Render()
+    +SetData()
+    +Render()
 }
 
 class DynamoDBInstanceView {
-    SetData()
-    Render()
+    +SetData()
+    +Render()
 }
 
 class EC2InstanceView {
-    SetData()
-    Render()
+    +SetData()
+    +Render()
 }
 
 class S3InstanceView {
-    SetData()
-    Render()
+    +SetData()
+    +Render()
 }
 
-ListView *-down- RegionListView
-ListView *-down- ServiceListView
-ListView *-down- ServiceInstanceListView
+ListView *-up- RegionListView
+ListView *-up- ServiceListView
+ListView *-up- ServiceInstanceListView
 
 @enduml

@@ -5,10 +5,11 @@
 class Region {
     +Id: string
     -services: []*Service
+    -session  *Session
     +UpdateServiceInstances(serviceId string)
-    +GetServiceIds() []string
-    -getServiceById(serviceId string) *Service
-    -getServiceInstanceById(service *Service, instanceId string) *ServiceInstance
+    +GetServiceIds(): []string
+    -getServiceById(serviceId string): *Service
+    -getServiceInstanceById(service *Service, instanceId string): *ServiceInstance
 }
 
 class Service {
@@ -16,8 +17,8 @@ class Service {
     -instances: []*ServiceInstance
     +SetServiceInstances(serviceInstances []*ServiceInstance)
     +UpdateServiceInstance(serviceInstance *ServiceInstance)
-    +GetServiceInstanceIds() []string
-    -getServiceInstanceById(instanceId string) *ServiceInstance
+    +GetServiceInstanceIds(): []string
+    -getServiceInstanceById(instanceId string): *ServiceInstance
 }
 
 interface ServiceInstance {

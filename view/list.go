@@ -43,6 +43,15 @@ func (r *ListView) Render() {
 	termui.Render(r.listWidget)
 }
 
+func (r *ListView) HandleEvent(event string) {
+	switch event {
+	case "j", "<Down>":
+		r.ScrollDown()
+	case "k", "<Up>":
+		r.ScrollUp()
+	}
+}
+
 func (r *ListView) ScrollUp() {
 	r.listWidget.ScrollUp()
 }

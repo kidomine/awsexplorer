@@ -2,8 +2,7 @@ package main
 
 import (
 	"github.com/gizak/termui"
-	"github.com/kidomine/awsexplorer/model"
-	"github.com/kidomine/awsexplorer/view"
+	"github.com/kidomine/awsexplorer/controller"
 	"log"
 )
 
@@ -13,17 +12,8 @@ func main() {
 	}
 	defer termui.Close()
 
-	var serviceList []string
-	rs := model.NewRegionList()
-
-	regionListView := view.NewRegionListView(model.GetRegionIds(rs))
-	serviceListView := view.NewServiceListView(serviceList)
-
-	currRegion := model.SelectRegionById(rs, regionListView.GetSelectedData())
-	serviceListView.SetData(currRegion.GetServiceIds())
-
-	regionListView.Render()
-	serviceListView.Render()
+	ctrl := controller.Controller{}
+	ctrl.Initialize()
 
 	uiEvents := termui.PollEvents()
 	for {
@@ -31,10 +21,11 @@ func main() {
 		switch e.ID {
 		case "q", "<C-c>":
 			return
-		case "h", "<Left>":
-			//
-		case "l", "<Right>":
-			//
+		default:
+			// let the controller handle the other events
+			ctrl.HandleEvent(e.ID)
 		}
+
+		ctrl.Render()
 	}
 }

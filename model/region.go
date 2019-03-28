@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"reflect"
 )
 
 type Region struct {
@@ -13,52 +12,22 @@ type Region struct {
 	session  *session.Session
 }
 
-func NewRegionList() []*Region {
-	var regions []*Region
-
+func NewRegion(regionId string) *Region {
 	allRegions := getAllRegions()
-	regionIds := getRegionIDs(allRegions)
+	region := allRegions[regionId]
 
-	for _, regionId := range regionIds {
-		region := allRegions[regionId]
-		regions = append(regions, newRegion(regionId, &region))
-	}
-
-	return regions
+	return newRegion(regionId, &region)
 }
 
-func GetRegionIds(regionList []*Region) []string {
+func GetRegionIds() []string {
 	var regionIds []string
+	regionList := getAllRegions()
+
 	for _, region := range regionList {
-		regionIds = append(regionIds, region.Id)
+		regionIds = append(regionIds, region.ID())
 	}
 
 	return regionIds
-}
-
-func SelectRegionById(regionList []*Region, regionId string) *Region {
-	for _, region := range regionList {
-		if region.Id == regionId {
-			return region
-		}
-	}
-
-	return nil
-}
-
-func newRegion(regionId string, awsRegion *endpoints.Region) *Region {
-
-	sessionInstance, _ := session.NewSession(&aws.Config{Region: aws.String(regionId)})
-
-	awsServices := awsRegion.Services()
-	var services []*Service
-
-	for _, serviceId := range getServiceIDs(awsRegion) {
-		awsService := awsServices[serviceId]
-		services = append(services, newService(serviceId, &awsService))
-	}
-
-	return &Region{regionId, services, sessionInstance}
 }
 
 func (r *Region) UpdateServiceInstances(serviceId string) {
@@ -68,6 +37,7 @@ func (r *Region) UpdateServiceInstances(serviceId string) {
 	service := r.getServiceById(serviceId)
 	if service != nil {
 		for _, serviceInstance := range serviceInstances {
+			//TODO: update serviceInstance here
 			service.UpdateServiceInstance(serviceInstance)
 		}
 	}
@@ -101,7 +71,6 @@ func (r *Region) GetServiceInstanceById(serviceId, instanceId string) ServiceIns
 	return *r.getServiceById(serviceId).getServiceInstanceById(instanceId)
 }
 
-// Helper functions
 func (r *Region) getServiceById(serviceId string) *Service {
 	for _, service := range r.services {
 		if service.Id == serviceId {
@@ -110,6 +79,22 @@ func (r *Region) getServiceById(serviceId string) *Service {
 	}
 
 	return nil
+}
+
+// Helper functions
+func newRegion(regionId string, awsRegion *endpoints.Region) *Region {
+
+	sessionInstance, _ := session.NewSession(&aws.Config{Region: aws.String(regionId)})
+
+	awsServices := awsRegion.Services()
+	var services []*Service
+
+	for _, serviceId := range getServiceIDs(awsRegion) {
+		awsService := awsServices[serviceId]
+		services = append(services, newService(serviceId, &awsService))
+	}
+
+	return &Region{regionId, services, sessionInstance}
 }
 
 func appendRegions(allRegions map[string]endpoints.Region, subRegions map[string]endpoints.Region) map[string]endpoints.Region {
@@ -134,25 +119,4 @@ func getAllRegions() map[string]endpoints.Region {
 	allRegions = appendRegions(allRegions, govRegions)
 
 	return allRegions
-}
-
-func getRegionIDs(allRegions map[string]endpoints.Region) []string {
-	keys := reflect.ValueOf(allRegions).MapKeys()
-	regionValues := make([]string, len(keys))
-
-	for i := 0; i < len(keys); i++ {
-		regionValues[i] = keys[i].String()
-	}
-	return regionValues
-}
-
-func getServiceIDs(region *endpoints.Region) []string {
-	regionalServices := region.Services()
-	keys := reflect.ValueOf(regionalServices).MapKeys()
-	serviceIds := make([]string, len(keys))
-
-	for i := 0; i < len(keys); i++ {
-		serviceIds[i] = keys[i].String()
-	}
-	return serviceIds
 }

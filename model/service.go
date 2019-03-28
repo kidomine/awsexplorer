@@ -1,6 +1,9 @@
 package model
 
-import "github.com/aws/aws-sdk-go/aws/endpoints"
+import (
+	"github.com/aws/aws-sdk-go/aws/endpoints"
+	"reflect"
+)
 
 type Service struct {
 	Id        string
@@ -10,6 +13,17 @@ type Service struct {
 func newService(serviceId string, awsService *endpoints.Service) *Service {
 	//serviceInstances := nil
 	return &Service{serviceId, nil}
+}
+
+func getServiceIDs(region *endpoints.Region) []string {
+	regionalServices := region.Services()
+	keys := reflect.ValueOf(regionalServices).MapKeys()
+	serviceIds := make([]string, len(keys))
+
+	for i := 0; i < len(keys); i++ {
+		serviceIds[i] = keys[i].String()
+	}
+	return serviceIds
 }
 
 func (s *Service) SetServiceInstances(serviceInstances []ServiceInstance) {
