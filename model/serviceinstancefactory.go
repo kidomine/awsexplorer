@@ -24,24 +24,31 @@
 
 package model
 
-type EC2Instance struct {
-	BaseInstance
+import (
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/lambda"
+)
+
+type ServiceInstanceListFactory func(awsSession *session.Session) []ServiceInstance
+
+func getDummyInstances(awsSession *session.Session) []ServiceInstance {
+	return nil
 }
 
-func (e *EC2Instance) GetId() string {
-	return e.id
+func getLambdaInstances(awsSession *session.Session) []ServiceInstance {
+	return getLambdaList(lambda.New(awsSession))
 }
 
-func (e *EC2Instance) GetData() string {
-	return e.data
-}
+func getServiceInstanceList(serviceId string) ServiceInstanceListFactory {
+	var serviceFactoryMap map[string]ServiceInstanceListFactory
+	serviceFactoryMap = make(map[string]ServiceInstanceListFactory, 2)
 
-func (e *EC2Instance) SetId(id string) {
-	e.id = id
-}
+	serviceFactoryMap["lambda"] = getLambdaInstances
 
-func (e *EC2Instance) SetData(data interface{}) {
-	if _data, ok := data.(string); ok {
-		e.data = _data
+	factory := serviceFactoryMap[serviceId]
+	if factory == nil {
+		factory = getDummyInstances
 	}
+
+	return factory
 }
