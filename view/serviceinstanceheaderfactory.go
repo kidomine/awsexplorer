@@ -24,37 +24,40 @@
 
 package view
 
-import (
-	"strings"
-)
+type ServiceInstanceHeaderFactory func() []string
 
-type ServiceInstanceListView struct {
-	ListView
+func getDummyInstanceHeader() []string {
+	return []string{"header 1", "header 2"}
 }
 
-type ServiceInstanceTableView struct {
-	TableView
+func getEC2InstanceHeader() []string {
+	return []string{"header 1", "header 2"}
 }
 
-// This function should be called only once due to the fact that the
-// coordinates of the widget is fixed.
-// TODO: use view.TerminalEnvironment to determine actual terminal dimension
-func NewServiceInstanceListView(serviceInstanceList []string) *ServiceInstanceListView {
-	terminal := NewTerminalEnvironment()
-	listView := newListView("Service Instances", 42, 0, 82, terminal.Height(), serviceInstanceList)
-	return &ServiceInstanceListView{*listView}
+func getDynamoDBInstanceHeader() []string {
+	return []string{"header 1", "header 2"}
 }
 
-// TODO: use view.TerminalEnvironment to determine actual terminal dimension
-func NewServiceInstanceTableView(serviceId string, serviceInstanceData []string) *ServiceInstanceTableView {
-	terminal := NewTerminalEnvironment()
-	//fmt.Println(terminal.Height())
-	data := [][]string{getServiceInstanceHeader(serviceId)}
+func getLambdaInstanceHeader() []string {
+	return []string{"Function Name", "Runtime", "Size", "Date"}
+}
 
-	for _, _data := range serviceInstanceData {
-		data = append(data, strings.Split(_data, " "))
+func getS3InstanceHeader() []string {
+	return []string{"header 1", "header 2"}
+}
+
+func getServiceInstanceHeader(serviceId string) []string {
+	serviceHeaderFactoryMap := map[string]ServiceInstanceHeaderFactory{
+		"ec2":      getEC2InstanceHeader,
+		"dynamodb": getDynamoDBInstanceHeader,
+		"lambda":   getLambdaInstanceHeader,
+		"s3":       getS3InstanceHeader,
 	}
 
-	tableView := newTableView("Service Instances", 42, 0, 222, terminal.Height(), data)
-	return &ServiceInstanceTableView{*tableView}
+	factory := serviceHeaderFactoryMap[serviceId]
+	if factory == nil {
+		factory = getDummyInstanceHeader
+	}
+
+	return factory()
 }

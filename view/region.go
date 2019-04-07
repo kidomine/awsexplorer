@@ -30,7 +30,9 @@ type RegionListView struct {
 
 // This function should be called only once due to the fact that the
 // coordinates of the widget is fixed.
+// TODO: use view.TerminalEnvironment to determine actual terminal dimension
 func NewRegionListView(regionList []string) *RegionListView {
-	listView := newListView("Regions", 0, 0, 20, 45, regionList)
+	terminal := NewTerminalEnvironment()
+	listView := newListView("Regions", 0, 0, 20, terminal.Height(), regionList)
 	return &RegionListView{*listView}
 }

@@ -30,7 +30,9 @@ type ServiceListView struct {
 
 // This function should be called only once due to the fact that the
 // coordinates of the widget is fixed.
+// TODO: use view.TerminalEnvironment to determine actual terminal dimension
 func NewServiceListView(serviceList []string) *ServiceListView {
-	listView := newListView("Services", 21, 0, 41, 45, serviceList)
+	terminal := NewTerminalEnvironment()
+	listView := newListView("Services", 21, 0, 41, terminal.Height(), serviceList)
 	return &ServiceListView{*listView}
 }

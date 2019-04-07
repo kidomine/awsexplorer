@@ -25,36 +25,50 @@
 package view
 
 import (
-	"strings"
+	"github.com/gizak/termui"
+	"github.com/gizak/termui/widgets"
 )
 
-type ServiceInstanceListView struct {
-	ListView
+type TableView struct {
+	tableWidget *widgets.Table
 }
 
-type ServiceInstanceTableView struct {
-	TableView
+func newTableWidget(title string, x1, y1, x2, y2 int) *widgets.Table {
+	tableWidget := widgets.NewTable()
+	tableWidget.Title = title
+	tableWidget.Rows = nil
+	tableWidget.TextStyle = termui.NewStyle(termui.ColorYellow)
+	tableWidget.SetRect(x1, y1, x2, y2)
+	tableWidget.TextAlign = termui.AlignCenter
+
+	return tableWidget
 }
 
 // This function should be called only once due to the fact that the
 // coordinates of the widget is fixed.
-// TODO: use view.TerminalEnvironment to determine actual terminal dimension
-func NewServiceInstanceListView(serviceInstanceList []string) *ServiceInstanceListView {
-	terminal := NewTerminalEnvironment()
-	listView := newListView("Service Instances", 42, 0, 82, terminal.Height(), serviceInstanceList)
-	return &ServiceInstanceListView{*listView}
+func newTableView(title string, x1, y1, x2, y2 int, tableData [][]string) *TableView {
+	tableWidget := newTableWidget(title, x1, y1, x2, y2)
+	tableView := &TableView{tableWidget}
+
+	tableView.SetData(tableData)
+
+	return tableView
 }
 
-// TODO: use view.TerminalEnvironment to determine actual terminal dimension
-func NewServiceInstanceTableView(serviceId string, serviceInstanceData []string) *ServiceInstanceTableView {
-	terminal := NewTerminalEnvironment()
-	//fmt.Println(terminal.Height())
-	data := [][]string{getServiceInstanceHeader(serviceId)}
+func (t *TableView) SetData(listData [][]string) {
+	t.tableWidget.Rows = listData
+}
 
-	for _, _data := range serviceInstanceData {
-		data = append(data, strings.Split(_data, " "))
+func (t *TableView) GetSelectedData() string {
+	//return t.tableWidget.Rows[t.tableWidget]
+	return ""
+}
+
+func (t *TableView) Render() {
+	termui.Render(t.tableWidget)
+}
+
+func (t *TableView) HandleEvent(event string) {
+	switch event {
 	}
-
-	tableView := newTableView("Service Instances", 42, 0, 222, terminal.Height(), data)
-	return &ServiceInstanceTableView{*tableView}
 }

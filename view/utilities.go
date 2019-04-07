@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package controller
+package view
 
 import (
 	"log"
@@ -37,8 +37,11 @@ type TerminalEnvironment struct {
 	height int
 }
 
-func (t *TerminalEnvironment) Initialize() {
-	t.width, t.height = t.getDimensions()
+func NewTerminalEnvironment() *TerminalEnvironment {
+	terminalEnvironment := &TerminalEnvironment{}
+	terminalEnvironment.width, terminalEnvironment.height = terminalEnvironment.getDimensions()
+
+	return terminalEnvironment
 }
 
 func (t *TerminalEnvironment) Update() {
@@ -56,8 +59,8 @@ func (t *TerminalEnvironment) getDimensions() (int, int) {
 	}
 
 	dimensions := strings.Split(string(output), " ")
-	width, _ := strconv.Atoi(dimensions[0])
-	height, _ := strconv.Atoi(strings.TrimSuffix(dimensions[1], "\n"))
+	width, _ := strconv.Atoi(dimensions[1])
+	height, _ := strconv.Atoi(strings.TrimSuffix(dimensions[0], "\n"))
 
 	return width, height
 }

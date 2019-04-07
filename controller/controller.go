@@ -30,19 +30,16 @@ import (
 )
 
 type Controller struct {
-	regionList              []*model.Region
-	views                   []view.View
-	regionListView          *view.RegionListView
-	serviceListView         *view.ServiceListView
-	serviceInstanceListView *view.ServiceInstanceListView
-	currViewIndex           int
+	regionList               []*model.Region
+	views                    []view.View
+	regionListView           *view.RegionListView
+	serviceListView          *view.ServiceListView
+	serviceInstanceTableView *view.ServiceInstanceTableView
+	currViewIndex            int
 }
 
 func (c *Controller) Initialize() {
 	regionIds := model.GetRegionIds()
-
-	// dummy variable
-	var serviceInstanceList []string
 
 	for _, regionId := range regionIds {
 		c.regionList = append(c.regionList, model.NewRegion(regionId))
@@ -51,11 +48,13 @@ func (c *Controller) Initialize() {
 	c.views = make([]view.View, 3)
 	c.setRegionListView(view.NewRegionListView(regionIds))
 	currRegion := c.SelectRegionById(c.regionListView.GetSelectedData())
+
 	c.setServiceListView(view.NewServiceListView(currRegion.GetServiceIds()))
-	c.setServiceInstanceListView(view.NewServiceInstanceListView(serviceInstanceList))
+	c.setServiceInstanceTableView(view.NewServiceInstanceTableView(c.serviceListView.GetSelectedData(), []string{""}))
+
 	c.regionListView.Render()
 	c.serviceListView.Render()
-	c.serviceInstanceListView.Render()
+	c.serviceInstanceTableView.Render()
 
 	c.currViewIndex = 0
 }
@@ -70,9 +69,9 @@ func (c *Controller) setServiceListView(serviceListView *view.ServiceListView) {
 	c.views[1] = c.serviceListView
 }
 
-func (c *Controller) setServiceInstanceListView(serviceInstanceListView *view.ServiceInstanceListView) {
-	c.serviceInstanceListView = serviceInstanceListView
-	c.views[2] = c.serviceInstanceListView
+func (c *Controller) setServiceInstanceTableView(serviceInstanceTableView *view.ServiceInstanceTableView) {
+	c.serviceInstanceTableView = serviceInstanceTableView
+	c.views[2] = c.serviceInstanceTableView
 }
 
 func (c *Controller) SelectRegionById(regionId string) *model.Region {
@@ -105,12 +104,15 @@ func (c *Controller) HandleEvent(event string) {
 			c.setServiceListView(view.NewServiceListView(newRegion.GetServiceIds()))
 			c.serviceListView.Render()
 		case 1:
-			//service list has been updated
+			// service list has been updated
 			// Render() the service instance list immediately
+
 			currRegion := c.SelectRegionById(c.regionListView.GetSelectedData())
-			serviceInstanceIds := currRegion.GetServiceInstanceIds(c.serviceListView.GetSelectedData())
-			c.setServiceInstanceListView(view.NewServiceInstanceListView(serviceInstanceIds))
-			c.serviceInstanceListView.Render()
+			serviceId := c.serviceListView.GetSelectedData()
+
+			c.setServiceInstanceTableView(view.NewServiceInstanceTableView(serviceId,
+				currRegion.GetServiceInstanceData(serviceId)))
+			//c.serviceInstanceTableView.Render()
 		case 2:
 			// service instance list has been updated
 		}
