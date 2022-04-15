@@ -25,7 +25,7 @@
 package main
 
 import (
-	"github.com/gizak/termui"
+	"github.com/gizak/termui/v3"
 	"github.com/kidomine/awsexplorer/controller"
 	"log"
 )

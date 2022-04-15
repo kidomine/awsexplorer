@@ -25,8 +25,8 @@
 package view
 
 import (
-	"github.com/gizak/termui"
-	"github.com/gizak/termui/widgets"
+	"github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
 type TableView struct {
@@ -39,7 +39,7 @@ func newTableWidget(title string, x1, y1, x2, y2 int) *widgets.Table {
 	tableWidget.Rows = nil
 	tableWidget.TextStyle = termui.NewStyle(termui.ColorYellow)
 	tableWidget.SetRect(x1, y1, x2, y2)
-	tableWidget.TextAlign = termui.AlignCenter
+	tableWidget.TextAlignment = termui.AlignCenter
 
 	return tableWidget
 }
